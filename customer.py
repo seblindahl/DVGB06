@@ -1,4 +1,3 @@
-from bank_central import BankCentral
 from account import Account
 from typing import List
 
