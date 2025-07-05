@@ -1,5 +1,5 @@
-from account import Account
 from typing import List
+from account import Account
 
 class Customer:
     def __init__(self, p_num: int, name: str, surname: str):

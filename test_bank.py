@@ -8,9 +8,10 @@ class TestBank:
     def run_tests(self):#fler test kommer, bla utskrift
         self.test_get_all_customers(expected = [])
 
-        self.test_create_customer("Bengt", "Karlsson", "8110102424", expected = True)
+        self.test_create_customer("Bengt", "Karlsson", "198110102424", expected = True)
 
-        self.test_create_customer("Bengt", "Karlsson", "8110102424", expected = False)
+        self.test_create_customer("Bengt", "Karlsson", "19"
+                                                       "8110102424", expected = False)
 
     def test_get_all_customers (self, expected):
         result = self.bank.get_all_customers()

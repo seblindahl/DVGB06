@@ -4,14 +4,13 @@ import locale # svensk bank svenska kronor
 from customer import Customer
 
 class BankCentral:
-    __standardPNumLength = 10
 
     def __init__(self):
         self.customers: List[Customer] = []
 
     #metoder för customer objekt
     def create_customer(self, p_num: str, name: str, surname: str):
-        if self._get_customer(p_num):
+        if self._get_customer(p_num):#kontrollerar om kund redan finns
             return False
         self.customers.append(Customer(p_num, name, surname))  # Korrigerat 2506027 ordningsföljd
         return True
