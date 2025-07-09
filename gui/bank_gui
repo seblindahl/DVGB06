@@ -1,0 +1,177 @@
+import tkinter as tk
+from tkinter import messagebox # importeras inte ens med asterix
+from tkinter import ttk
+
+from bank_central import BankCentral
+
+standardPNumLength: int = 12 # Det är bättre att detta finns i GUI då kan bank_central användas i andra länder
+
+def clearNum(p_num):  # return str num
+    onlyNum = "".join(filter(str.isdigit, p_num))  # https://docs.python.org/3/library
+    return onlyNum
+
+
+def clearName(name):  # return str name
+    onlyLetters = "".join(filter(str.isalpha, name))
+    return onlyLetters
+
+
+def validPNum(p_num):  # return bool
+    onlyNum = "".join(filter(str.isdigit, p_num))
+    return len(onlyNum) == standardPNumLength
+
+
+def validName(name):  # return bool
+    onlyLetters = "".join(filter(str.isalpha, name))
+    return len(onlyLetters) > 0
+
+
+
+
+class BankGui(tk.Tk):
+    def __init__(self):
+        super().__init__()
+
+
+
+        font1 = "Arial"
+        font1_size = 13
+        frame_n = 4
+        window_height = 800
+        window_width = 1200
+        window_size = f"{window_width}x{window_height}"
+        frame_height = window_height // frame_n
+        tf_width = 20  # textfältsbredd symetri
+
+        self.bank_object = BankCentral()
+        self.title("BankOfPython - Main window")
+        # self.iconbitmap("adress") gör en icon
+        self.geometry(window_size)
+
+        self.frame1 = tk.Frame(self, bg="blue")
+        self.frame2 = tk.Frame(self, bg="red")
+        self.frame3 = tk.Frame(self, bg="white")
+        self.frame4 = tk.Frame(self, bg="grey")
+        self.frame5 = tk.Frame(self, bg="grey")
+
+        self.frame1.pack(side="top",fill="both", expand=True)
+        self.frame2.pack(side="top",fill="both", expand=True)
+        self.frame3.pack(side="top",fill="both", expand=True)
+        self.frame4.pack(side="top",fill="both", expand=True)
+        self.frame5.pack(side="top", fill="both", expand=True)
+
+        #frame1 kund kontroll
+        self.control_frame = ControlFrame(self.frame1, panel_class = CustomerControl)
+        self.control_frame.pack(fill="both", expand=True)
+
+
+        #Frame2 Kund table
+        headings = ["Personnummer", "namn", "efternamn"]
+        self.customerTree = TreeScrollFrame(self.frame2, headings)
+        self.customerTree.pack(fill="both", expand=True)
+        #def get_p_num_from_tf(self, data):
+            #self.customerTree.insert_data(data)
+
+        #frame3 Kontrollpanel för konton
+        self.control_frame = ControlFrame(self.frame3)
+        self.control_frame.pack(fill="both", expand=True)
+
+        #Frame4 Konto table
+        headings = ["kontonummer", "Typ", "saldo"]
+        self.customerTree = TreeScrollFrame(self.frame4, headings)
+        self.customerTree.pack(fill="both", expand=True)
+
+        #frame 5 transaktionsdata table
+        headings = ["Datum", "Typ", "belopp", "saldo"]
+        self.customer_tree = TreeScrollFrame(self.frame5, headings)
+        self.customer_tree.pack(fill="both", expand=True)
+
+class ControlFrame(tk.Frame):
+    def __init__(self, parent, panel_class=None):
+        super().__init__(parent)
+
+        self.i_frame1 = tk.Frame(self, bg="blue")
+        self.i_frame2 = tk.Frame(self, bg="red")
+        self.i_frame3 = tk.Frame(self, bg="white")
+
+        self.i_frame1.pack(side="left", fill="both", expand=True)
+        self.i_frame2.pack(side="left", fill="y", expand=True)
+        self.i_frame3.pack(side="left", fill="both", expand=True)
+
+        #om någon skickar in widget med textfields och lables osv. så läggs detta in i mittersta frame
+        if panel_class:
+            self.panel_class = panel_class(self.i_frame2)
+            self.panel_class.pack(fill="both", expand=True)
+
+class CustomerControl(tk.Frame): #källa: https://www.youtube.com/watch?v=7A_csP9drJw&t=434s
+    def __init__(self,parent, p_num_tf=None):
+        super().__init__(parent)
+
+        tf_width = 20
+
+        #label
+        self.label1 = tk.Label(self, text="Personummer", font=("Arial", 13))
+        self.label2 = tk.Label(self, text="namn", font=("Arial", 13))
+        self.label3 = tk.Label(self, text="efternamn", font=("Arial", 13))
+
+        #textfields
+        self.entry1 = tk.Entry(self, width=tf_width)
+        self.entry2 = tk.Entry(self, width=tf_width)
+        self.entry3 = tk.Entry(self, width=tf_width)
+
+        #knappar
+        self.button1 = tk.Button(self, text="Sök", command=None)
+        self.button2 = tk.Button(self, text="Rensa")
+
+        #def get_p_num_from_tf(self):#skickar p_num till huvudklassen
+            #self.entry1.get_p_num_from_tf(self.entry1.get())#anrolpar metod i huvudklassen som skickar atribut p_num i entry1
+
+
+
+        #måste överge pack när det är formulär tillförmån för .grid
+        self.label1.grid(row=0, column=0)
+        self.label2.grid(row=1, column=0)
+        self.label3.grid(row=2, column=0)
+        self.entry1.grid(row=0, column=1)
+        self.entry2.grid(row=1, column=1)
+        self.entry3.grid(row=2, column=1)
+        self.button1.grid(row=3, column=1, sticky="w")
+        self.button2.grid(row=3, column=1, sticky="e")
+
+        #gör kolumnerna expanderbara
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.columnconfigure(2, weight=1)
+
+class TreeScrollFrame(tk.Frame): #källa: https://www.youtube.com/watch?v=YTqDYmfccQU&t=242s
+    def __init__(self, parent, col, col_widths = None):
+        super().__init__(parent)
+
+        # treeview med scrollbar för kund-, konto-, transaktionsdata.
+        self.tree = ttk.Treeview(self, columns=col, show="headings")#skapar träd
+
+        for i, c in enumerate(col):#olika kolumner och kolumnheadings
+            width = col_widths[i] if col_widths else 100
+            self.tree.heading(c, text=c)
+            self.tree.column(c, width=width)
+
+        scrollbar = tk.Scrollbar(self, orient="vertical", command="tree.yview")
+        self.tree.configure(yscrollcommand=scrollbar.set)#kollpar scrollbar till tree
+        self.tree.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+    def insert_data (self, data):#lägger till data i ny rad
+        self.tree.insert("", "end", values=data)
+
+
+def create_customer(self, input_p_num , input_name,  input_surname):
+        if not validPNum(input_p_num):
+            messagebox.showerror("Fel", "Personnummer måste innehålla 12 siffror")
+        if not validName(input_name) or not validName(input_surname):
+            messagebox.showerror("Fel", "Namn och/eller efternamn saknas")
+        new_cust_confirm = self.bank_object.create_customer(input_p_num, input_name, input_surname)
+        if not new_cust_confirm:
+            messagebox.showerror("Fel", "Personnummer finns redan")
+        else:
+            messagebox.showinfo("Confirm", "Kund tillagd")  # ska använda fstängs - utskriftsmetoderna istället
+
