@@ -1,5 +1,5 @@
-from account import Account
 from typing import List
+from account import Account
 
 class Customer:
     def __init__(self, p_num: int, name: str, surname: str):
@@ -10,8 +10,11 @@ class Customer:
 
     def get_customer_account(self, account_id: int):
         for account in self.customer_accounts:
-            if account.account_num == account_id:
+            if str(account.account_num) == str(account_id):
+             print (account_id)
              return account
+        print("NONE")
+        return None
 
     def get_customer_p_num(self):
         return self.name
@@ -20,7 +23,7 @@ class Customer:
         return self.name
 
     def get_customer_surname(self):
-        return self.surnamename
+        return self.surname
 
     def set_p_num(self, new_p_num):
         self.p_num = new_p_num
