@@ -1,3 +1,6 @@
+"""
+gammal kod
+
 from bank_central import BankCentral
 import tkinter
 from tkinter import messagebox #ingår inte automatiskt i thinker https://docs.python.org/3/library
@@ -72,3 +75,5 @@ surname_tf.grid(column= 1, row= 2)
 
 
 window1.mainloop()#låter fönstret vara kvar och lyssnar kontinuerligt
+
+"""
