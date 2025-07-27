@@ -20,16 +20,16 @@ class Account:
         return self.balance
 
     def get_intrest_rate(self):
-        return self._intrest_rate
+        return self.intrest_rate
 
     def get_intrest(self):
-        return self._balance * (self._intrest_rate / 100)
+        return self.balance * (self.intrest_rate / 100)
 
     def get_account_num(self):
-        return self._account_num
+        return self.account_num
 
     def get_account_type(self):
-        return self._account_balance
+        return self.account_type
 
     def deposit(self, amount: int):
         if int(amount) > 0:
@@ -40,10 +40,10 @@ class Account:
             return [transaction_tuple]#returnerar lista och inte None
         return None
 
-    def withdraw(self, amount: int):
-        if 0 < amount <= self._balance:
-            self.balance += amount
-            tid = datetime.datetime.now(9)
+    def withdrawal(self, amount: int):
+        if int(amount) <= self.balance:
+            self.balance -= amount
+            tid = datetime.datetime.now()
             transaction_tuple = (tid, "Uttag", amount, self.balance)
             self.transaction_list.append(transaction_tuple)
             return [transaction_tuple]#returnerar lista och inte None
