@@ -140,18 +140,21 @@ class BankGui(tk.Tk):
             return
         messagebox.showinfo("Nytt kontonummer", account_num)
         return
-
-    def gui_deposit(self, account_num, amount):
+#Uppdaterat så att det även går att göra insättningar. Tänkte inte att Stringvar() inte är en sträng utan behöver getter.
+    def gui_transaction(self, trans_type, account_num, amount):
         print(self.displayed_p_num)
         print("kontonummer:", account_num)
         print("belopp:", amount)
+        print("type:", trans_type)
         int_amount = int(amount)#konvertera lägg till extra konvertering
-        transacation_tuple_list = self.bank_object.deposit(self.displayed_p_num, account_num,int_amount)
-        print("result:", transacation_tuple_list)
-        if transacation_tuple_list:
+        if trans_type == "deposit":
+            transacation_tuple_list = self.bank_object.deposit(self.displayed_p_num, account_num,int_amount)
+        elif trans_type == "withdrawal":
+            transacation_tuple_list  = self.bank_object.withdrawal(self.displayed_p_num, account_num, int_amount)
+        try:
             for transaction in transacation_tuple_list:
                 self.transaction_tree.insert_data(transaction)
-        else:
+        except TypeError:
             messagebox.showerror("Fel", "Insättning genomfördes ej")
 
 class ControlFrame(tk.Frame):
@@ -159,9 +162,9 @@ class ControlFrame(tk.Frame):
         super().__init__(parent)
         self.bank_gui = bank_gui #referens från subklass CustomerControl till masterklass
 
-        self.i_frame1 = tk.Frame(self, bg="blue")
-        self.i_frame2 = tk.Frame(self, bg="red")
-        self.i_frame3 = tk.Frame(self, bg="white")
+        self.i_frame1 = tk.Frame(self, bg="black")
+        self.i_frame2 = tk.Frame(self, bg="black")
+        self.i_frame3 = tk.Frame(self, bg="black")
 
         self.i_frame1.pack(side="left", fill="both", expand=True)
         self.i_frame2.pack(side="left", fill="y", expand=True)
@@ -173,9 +176,16 @@ class ControlFrame(tk.Frame):
             self.panel_class.pack(fill="both", expand=True)
 
 class CustomerControl(tk.Frame): #källa: https://www.youtube.com/watch?v=7A_csP9drJw&t=434s
-    def __init__(self,parent, bank_gui, external_new_customer = False):
+    def __init__(self,parent, bank_gui, external_new_customer = False, set_pno = "personnummer", set_name = "namn", set_surname = "efternamn"):
         super().__init__(parent)
         self.bank_gui = bank_gui #referens till överordnad subklass (ControlFrame)
+        entry1_text = StringVar()
+        entry2_text = StringVar()
+        entry3_text = StringVar()
+        entry1_text.set(set_pno)
+        entry2_text.set(set_name)
+        entry3_text.set(set_surname)
+
 
         tf_width = 20
 
@@ -185,8 +195,8 @@ class CustomerControl(tk.Frame): #källa: https://www.youtube.com/watch?v=7A_csP
         self.label3 = tk.Label(self, text="efternamn", font=("Arial", 13))
 
         #textfields
-        self.entry1 = tk.Entry(self, width=tf_width)
-        self.entry2 = tk.Entry(self, width=tf_width)
+        self.entry1 = tk.Entry(self, width=tf_width, textvariable = entry1_text)
+        self.entry2 = tk.Entry(self, width=tf_width, textvariable = entry2_text)
         self.entry3 = tk.Entry(self, width=tf_width)
 
         #knappar
@@ -248,16 +258,17 @@ class AccountControl(tk.Frame): #källa: https://www.youtube.com/watch?v=7A_csP9
         #textfields
         self.entry1 = tk.Entry(self, width=tf_width)
         self.entry2 = tk.Entry(self, width=tf_width)
-        #self.entry3 = tk.Entry(self, width=tf_width)
+        
 
-        #radioknappar källa: https://www.youtube.com/watch?v=kZM3O1F-U08
-        radio_value = StringVar()
-        radio_value.set("deposit")  # standardvärde uttag
-        self.radio1 = tk.Radiobutton(self, text="Uttag", variable=radio_value, value="withdrawal")
-        self.radio2 = tk.Radiobutton(self, text="Insättning", variable=radio_value, value="deposit")
+        # radioknappar källa: https://www.youtube.com/watch?v=kZM3O1F-U08
+        self.radio_value = StringVar()
+        self.radio_value.set("deposit")  # standardvärde uttag
+        self.radio1 = tk.Radiobutton(self, text="Uttag", variable=self.radio_value, value="withdrawal")
+        self.radio2 = tk.Radiobutton(self, text="Insättning", variable=self.radio_value, value="deposit")
+        
 
         #knappar
-        self.button1 = tk.Button(self, text="Utför", command= lambda: self.bank_gui.gui_deposit(self.entry1.get(), self.entry2.get()))
+        self.button1 = tk.Button(self, text="Utför", command= lambda: self.bank_gui.gui_transaction(self.radio_value.get(), self.entry1.get(), self.entry2.get()))
         self.button2 = tk.Button(self, text="Rensa", command= None)
 
 
