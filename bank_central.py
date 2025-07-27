@@ -89,14 +89,16 @@ class BankCentral:
         print("BankCentral_tuple:", temp)
         return temp
 
-    def withdraw(self, p_num:str, account_id: int, amount: int):
+    def withdrawal(self, p_num:str, account_id: int, amount: int):
         customer = self.get_customer(p_num)
-        account = customer.find_account(account_id) if customer else None
+        if not customer:
+            print("BankCentral: Ingen kund")
+            return None
+        account = customer.get_customer_account(account_id)
         if not account:
             return None
-        account_info = f"{self._get_account_num_str(account)} {self._get_amount_in_sek_str(account.balance)} {account.account_type} {self._intrest_rate_str(account.intrest_rate)}"#korrigerat 250626 felaktiga anrop
-        customer.delete_account(account_id)
-        return  account_info
+        temp = account.withdrawal(amount)
+        return temp
 
     #hjälpmetoder f-strängs utskrifter för bokföring - fanns i java versionen, nödvändigt? får se längre fram ev. messagebox och transaktioner
 
